@@ -16,16 +16,30 @@ axios
     console.log("final");
   });
   */
+function creatChart(tableID, style, labelsArray, datasetsArray) {
+  const table1 = document.getElementById(`${tableID}`);
+  const canvas1 = document.createElement("canvas");
+  table1.parentElement.insertBefore(canvas1, table1);
+  canvas1.style.width = "100%";
+  canvas1.style.height = "600px";
+  //canvas1.style.border = "blue solid 1px";
+  var ctx = canvas1.getContext("2d");
+  var lineChart = new Chart(ctx, {
+    type: `${style}`,
+    data: {
+      labels: labelsArray,
+      datasets: datasetsArray
+    },
+    options: {
+      responsive: true
+    },
+    hover: {
+      mode: "nearest",
+      intersect: true
+    }
+  });
+}
 
-const table1 = document.getElementById("table1");
-const canvas1 = document.createElement("canvas");
-table1.parentElement.insertBefore(canvas1, table1);
-canvas1.style.width = "100%";
-canvas1.style.height = "300px";
-canvas1.style.border = "blue solid 1px";
-var ctx = canvas1.getContext("2d");
-
-var data = [];
 const years = [];
 
 //console.log(table1.rows[1]);
@@ -34,6 +48,7 @@ for (var t = 0; t < table1.rows[1].cells.length - 2; t++) {
   m = t + 2;
   years[t] = table1.rows[1].cells[m].innerHTML.toLowerCase().replace(/ /gi, "");
 }
+//headers
 var headers = [];
 for (var i = 0; i < table1.rows[0].cells.length; i++) {
   headers[i] = table1.rows[0].cells[i].innerHTML
@@ -41,65 +56,68 @@ for (var i = 0; i < table1.rows[0].cells.length; i++) {
     .replace(/ /gi, "");
 }
 
-// go through cells
-for (var i = 1; i < table1.rows.length; i++) {
+// datapoints
+var data = [];
+for (var i = 2; i < table1.rows.length; i++) {
   var tableRow = table1.rows[i];
-  var rowData = {};
+  var rowData = [];
 
-  for (var j = 0; j < tableRow.cells.length; j++) {
-    rowData[headers[j]] = tableRow.cells[j].innerHTML;
+  for (var j = 2; j < tableRow.cells.length; j++) {
+    rowData[j - 2] = parseInt(tableRow.cells[j].innerHTML);
   }
 
   data.push(rowData);
 }
-
+//console.log(data);
+//countrys
 const country = [];
-//console.log(data.pays);
-function getCountrys() {
-  for (let i = 1; i < data.length; i++) {
-    data[i];
-    country.push(data[i].pays);
-  }
-  console.log(country);
+for (let i = 2; i < table1.rows.length; i++) {
+  country.push(table1.rows[i].cells[1].innerHTML);
 }
-getCountrys();
-//JSON.stringify(tableToJson(table1));
-//get label list
-
-var datasets = [
-  {
-    label: "beijing",
-    borderColor: "rgb(255, 99, 132)",
-    data: [0, 10, 5, 2, 20, 30, 45],
-    fill: false
-  },
-  {
-    label: "China",
-    borderColor: "rgb(11, 99, 132)",
-    data: [3, 14, 5, 2, 23, 32, 25],
-    fill: false
+//colors
+function getRandomColor() {
+  var letters = "0123456789ABCDEF";
+  var color = "#";
+  for (var i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * 16)];
   }
-];
-var newDatesets = {
-  label: country[4],
-  borderColor: "rgb(11, 99, 132)",
-  data: [],
-  fill: false
-};
-console.log(newDatesets);
-datasets.push(newDatesets);
+  return color;
+}
 
-var lineChart = new Chart(ctx, {
-  type: "line",
-  data: {
-    labels: years,
-    datasets: datasets
-  },
-  options: {}
-});
-//console.log(lineChart.data.datasets[0].label);
-//const yearInChart = lineChart.config.data.labels;
+//creat new datasets
+function Datasets(i) {
+  this.label = country[i];
+  this.data = data[i];
+  this.borderColor = getRandomColor();
+  this.fill = false;
+}
+const datasets = [];
+for (let i = 0; i < country.length; i++) {
+  datasets.push(new Datasets(i));
+}
+console.log(datasets);
+/* var datasets = [
+    {
+      label: "beijing",
+      borderColor: "rgb(255, 99, 132)",
+      data: [0, 10, 5, 2, 20, 30, 45],
+      fill: false
+    },
+    {
+      label: "China",
+      borderColor: "rgb(11, 99, 132)",
+      data: [3, 14, 5, 2, 23, 32, 25],
+      fill: false
+    }
+  ];
+  var newDatesets = {
+    label: country[4],
+    borderColor: "rgb(11, 99, 132)",
+    data: [],
+    fill: false
+  };
+  console.log(newDatesets);
+  datasets.push(newDatesets);
+  */
 
-//console.log(lineChart.config.data);
-
-//lineChart.config.data.datasets.push(newDatesets);
+creatChart("table1", "line", years, datasets);
