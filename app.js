@@ -93,7 +93,19 @@ for (let i = 1; i < table2.rows.length; i++) {
   datapoint1.push(table2.rows[i].cells[2].innerText);
   datapoint2.push(table2.rows[i].cells[3].innerText);
 }
-const color = ["#A7D2D6", "#F5C1C7"];
+const color = [
+  "#A7D2D6",
+  "#F5C1C7",
+  "#4dc9f6",
+  "#f67019",
+  "#f53794",
+  "#537bc4",
+  "#acc236",
+  "#166a8f",
+  "#00a950",
+  "#58595b",
+  "#8549ba"
+];
 
 function BarSet(i, j) {
   this.label = date[i];
@@ -109,16 +121,51 @@ datasets2.push(new BarSet(1, datapoint2));
 creatChart("table1", "line", years, datasets);
 creatChart("table2", "bar", country2, datasets2);
 //-------------------------fetch data from json api
-const data3 = [
-  [0, 9],
-  [1, 6],
-  [2, 7],
-  [3, 7],
-  [4, 7],
-  [5, 8],
-  [6, 9],
-  [7, 5],
-  [8, 3],
-  [9, 8]
+
+//1 get data function
+//2 creat chart
+const month = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December"
 ];
-creatChart("firstHeading", "bubble", data3, datasets2);
+async function dataXandY() {
+  const dataX = [];
+  const dataY = [];
+  for (let i = 0; i < month.length; i++) {
+    function creatRandom() {
+      let n;
+      n = Math.floor(Math.random() * 10);
+      return n;
+    }
+    dataX.push(creatRandom());
+    dataY.push(creatRandom());
+  }
+  return { dataX, dataY };
+}
+
+console.log();
+function LineChartSet(data, colornumber) {
+  this.label = "something";
+  this.data = data;
+  this.backgroundColor = colornumber;
+  this.fill = false;
+}
+async function getdataset3() {
+  const data3 = await dataXandY();
+  const datasets3 = [];
+  datasets3.push(new LineChartSet(data3.dataX, 0));
+  datasets3.push(new LineChartSet(data3.dataY, 1));
+  return datasets3;
+}
+console.log(getdataset3());
+creatChart("firstHeading", "line", month, getdataset3());
